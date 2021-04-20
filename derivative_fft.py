@@ -2,17 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 #from mpl_toolkits import mplot3d #only for 3d plots
-from calculations import calc_pm
+from calculations import calc_pm, V_barrier
 
 def f(x):
     return np.exp(-a*x*x)
     #return np.exp(-a*(x-t)**2)
 
-def NL(V):
+def NL(V,dt=0.05):
     '''Nonlinear exponential, where V is potential.'''
     return np.exp(-1j*dt*V)
 
-def DS(k):
+def DS(k, dt=0.05, m=1):
     '''Dispersive exponential'''
     return np.exp(1j*dt*k**2 / (2*m))
 
@@ -23,23 +23,18 @@ def eq1221(x,t, step_x=0.01, m=1, h=1):
 
 a = 0.5
 h = 1
-x_marg, step_x = 10, 0.01
-V, m = 0, 1
+x_marg, step_x = 100, 0.01
+m = 1
 dt = 0.05
 x = np.arange(-x_marg, x_marg, step_x)
+V = V_barrier(x, 5, 0.5, 5)
+
 
 #######################################################
 # p_m COEFFICIENTS
-p_m = calc_pm(m, len(x), step_x) #/ (2*np.pi)
+p_m = calc_pm(m, len(x), step_x) #/(2*np.pi)
 
-'''
-try:
-    n = int(input('How many derivatives do you want to calculate?\n'))
-except:
-    print("That was not a valid number.\n")
-    exit()
-'''
-n = 2
+n = 2 # how many derivatives to count - NOT USED
 
 #######################################################
 # FOURIER TRANSFORM
@@ -59,39 +54,42 @@ for iterations in range(1):
 fig = plt.figure()
 ax = plt.axes()
 
-# ax.plot(x, np.abs(psi[0]), label='f(x)')
-# for i in range(1,n+1):
-#     ax.plot(x, np.abs(psi[i]), label=f"$d^{i}/dx^{i} f(x)$", linewidth=5*np.random.rand(1))
-
-# ANALYTIC DERIVATIVE FORMULAS
-# ax.plot(x, -2*a*x*f(x), linestyle='-.', linewidth=3, label="Analytic f'(x)")
-# ax.plot(x, 2*a*f(x)*(2*a*x*x-1), linestyle='-.', linewidth=3, label="Analytic f''(x)")
-
-# y = eq1221(x,dt)
-y = psi[0]
+y = eq1221(x,0.01)
+#y = psi[0]
 line, = ax.plot(0,0)
-ax.set_xlim(-x_marg,x_marg)
-ax.set_ylim(-1,1)
+ax.set_xlim(-0.5*x_marg,0.5*x_marg)
+ax.set_ylim(-0.01,0.6)
+ax.plot(x, V)
+time = ax.text(0.35, 0.9, "Time: 0 s",
+        verticalalignment='bottom', horizontalalignment='right',
+        transform=ax.transAxes,
+        color='green', fontsize=15)
 
 def animation_frame(i):
-    global y, dt
+    global y, dt, p_m
     if not pause:
-        y = np.fft.fft(NL(V) * y)
-        y = np.fft.ifft(DS(p_m) * y)
+        time.set_text("Time: {} s".format(np.round(i*dt,2)))
+        y = np.fft.fft(NL(V,dt) * y)
+
+        #y = np.fft.ifft(DS(p_m,dt) * y)
+        y = np.fft.ifft(DS(0.25*p_m - 60*dt, dt) * y)
+        
         line.set_xdata(x)
         line.set_ydata(np.abs(y))
-        print('Time: {} s'.format(np.round(i*dt,2)))
     return line,
 
 pause = False
 def onClick(event):
     global pause
     pause ^= True
+
 fig.canvas.mpl_connect('button_press_event', onClick)
 
-anim = animation.FuncAnimation(fig, func=animation_frame, frames=201, interval=1, repeat=False)
+anim = animation.FuncAnimation(fig, func=animation_frame, frames=3*200, interval=10, repeat=False)
 #uncomment below to save animation, needs imagemagick installed
 #anim.save("/tmp/animation.gif", writer="imagemagick", fps=30)
 
 #plt.legend()
 plt.show()
+
+
