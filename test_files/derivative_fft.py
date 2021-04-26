@@ -27,7 +27,7 @@ x_marg, step_x = 100, 0.01
 m = 1
 dt = 0.05
 x = np.arange(-x_marg, x_marg, step_x)
-V = V_barrier(x, 1, 1.5, 0.5)
+V = V_barrier(x, 5, 0.5, 5)
 
 
 #######################################################
@@ -58,7 +58,7 @@ y = eq1221(x,0.01)
 #y = psi[0]
 line, = ax.plot(0,0)
 ax.set_xlim(-0.5*x_marg,0.5*x_marg)
-ax.set_ylim(-0.01,4)
+ax.set_ylim(-0.01,0.6)
 ax.plot(x, V)
 time = ax.text(0.35, 0.9, "Time: 0 s",
         verticalalignment='bottom', horizontalalignment='right',
@@ -86,8 +86,8 @@ def onClick(event):
 fig.canvas.mpl_connect('button_press_event', onClick)
 
 anim = animation.FuncAnimation(fig, func=animation_frame, frames=3*200, interval=10, repeat=False)
+#uncomment below to save animation, needs imagemagick installed
+#anim.save("/tmp/animation.gif", writer="imagemagick", fps=30)
 
 #plt.legend()
 plt.show()
-
-

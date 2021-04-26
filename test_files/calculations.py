@@ -24,10 +24,6 @@ def V_barrier(x, x_0, value=0, width=0):
     for ix in range(len(x)):
         if x[ix] >= x_0 and x[ix] <= x_0 + width:
             barrier[ix] = value
-        elif x[ix] >= x_0+4 and x[ix] <= x_0+4 + width:
-            barrier[ix] = value + 1
-        elif x[ix] >= x_0+10 and x[ix] <= x_0+10 + width:
-            barrier[ix] = value + 2
         else:
             barrier[ix] = 0
 
@@ -37,18 +33,14 @@ def V_barrier(x, x_0, value=0, width=0):
 '''
 #######################################################
 # 3D Ploting
-
 fig = plt.figure()
 ax = plt.axes(projection="3d")
-
 ax.plot3D(x,f(x))
 for i in range(n):
     ax.plot3D(x, np.real(psi[i]), np.imag(psi[i]), label="{} pochodna".format(i+1))
-
 ax.set_xlabel('x')
 ax.set_ylabel("Real")
 ax.set_zlabel("Imag")
-
 plt.show()
 '''
 
@@ -56,7 +48,6 @@ plt.show()
 # ax.plot(x, np.abs(psi[0]), label='f(x)')
 # for i in range(1,n+1):
 #     ax.plot(x, np.abs(psi[i]), label=f"$d^{i}/dx^{i} f(x)$", linewidth=5*np.random.rand(1))
-
 # ANALYTIC DERIVATIVE FORMULAS
 # ax.plot(x, -2*a*x*f(x), linestyle='-.', linewidth=3, label="Analytic f'(x)")
 # ax.plot(x, 2*a*f(x)*(2*a*x*x-1), linestyle='-.', linewidth=3, label="Analytic f''(x)")
